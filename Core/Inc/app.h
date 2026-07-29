@@ -31,6 +31,7 @@
 
 #define ONE_OF_THREE_UINT32_MAX 1431655765U
 #define TWO_OF_THREE_UINT32_MAX 2863311530U
+#define DOUBLE_PI 6.2831853f
 
 // ADC 注入采样与单频检测参数
 // 采样率 fs = 20 kHz（TIM1 周期 8000 @160MHz，CC4 每周期触发一次注入转换）
