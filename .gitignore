@@ -1,0 +1,19 @@
+# dot files
+/.vscode/launch.json
+/.settings
+/.eide/log
+/.eide.usr.ctx.json
+
+# project out
+/build
+/bin
+/obj
+/out
+
+# eide template
+*.ept
+*.eide-template
+
+# STM32CubeMX 自动生成的 文件
+/Drivers
+/.cmsis
