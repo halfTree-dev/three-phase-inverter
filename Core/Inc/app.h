@@ -7,21 +7,18 @@
 #define ANGLE_RESOLUTION 4096
 
 // 调制比步进率
-#define MODULATION_RATIO_STEP 0.0001f
-#define MODULATION_RATIO_MAX 0.95f
+#define MODULATION_RATIO_MAX 0.96f
 #define MODULATION_RATIO_MIN 0.05f
 // 设置 20kHz / 1000 = 20Hz 的调制比更新循环
 // 注意幅值也是每 20Hz 一更新
 #define MODULATION_LOOP_COUNTER 1000
 
 // 闭环目标参数
-// 5V 的测试闭环目标参数
-// #define TARGET_G_VPP 195.0f
+// 6V 的测试闭环目标参数
+// #define TARGET_G_VPP 230.0f
 
 // 32V 的测试闭环目标参数
-#define TARGET_G_VPP 1750.0f
-
-#define TARGET_G_VPP_DEADZONE 10.0f
+#define TARGET_G_VPP 1780.0f
 
 // 计数器
 #define COUNTER_PERIOD 8000.0f
@@ -43,6 +40,10 @@
 #define GOERTZEL_K     3u
 // Goertzel 系数 coeff = 2*cos(2*pi*k/N) = 2*cos(2*pi*3/1000)
 #define GOERTZEL_COEFF 1.9996447f
+
+// 调制比调控的 PI 参数
+#define MOD_CONTROL_KP 4.5e-5f
+#define MOD_CONTROL_KI 1.5e-5f
 
 void App_Init();
 void App_Loop();

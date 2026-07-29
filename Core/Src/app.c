@@ -13,6 +13,7 @@ extern UART_HandleTypeDef huart1;
 // 采样结果和幅值推断结果
 volatile uint32_t adc_value;
 volatile float g_vpp_code = 0.0f;
+volatile float g_vpp_sum = 0.0f;
 volatile float g_vpp_avg = 0.0f;
 
 // 调制比
@@ -54,8 +55,6 @@ void App_Loop() {
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     // 调制比更新 COUNTER
     static uint32_t modulation_loop_counter = 0u;
-    // G_VPP 累计值
-    static float g_vpp_sum = 0.0f;
 
     if (htim->Instance == TIM1) {
         // 更新电机状态并设置新的占空比值
@@ -65,22 +64,26 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
         __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_3, _Get_SPWM_Counter_Value(current_phase + TWO_OF_THREE_UINT32_MAX));
         g_vpp_sum += g_vpp_code;
 
+        // 调制比受到 PID 调控
         if (++modulation_loop_counter >= MODULATION_LOOP_COUNTER) {
+            static float last_err = 0.0f;
+
+            g_vpp_avg = g_vpp_sum / MODULATION_LOOP_COUNTER;
+
+            float modulation_ratio_delta = 0.0f;
+            float err = TARGET_G_VPP - g_vpp_avg;
+            modulation_ratio_delta = MOD_CONTROL_KP * (err - last_err) + MOD_CONTROL_KI * err;
             modulation_loop_counter = 0u;
-            // 取平均，认定此为结果，并依此修改调制比
-            g_vpp_sum = g_vpp_sum / MODULATION_LOOP_COUNTER;
-            g_vpp_avg = g_vpp_sum;
-            if (g_vpp_sum > TARGET_G_VPP + TARGET_G_VPP_DEADZONE) {
-                modulation_ratio -= MODULATION_RATIO_STEP;
-            } else if (g_vpp_sum < TARGET_G_VPP - TARGET_G_VPP_DEADZONE) {
-                modulation_ratio += MODULATION_RATIO_STEP;
-            }
-            if (modulation_ratio > MODULATION_RATIO_MAX) {
-                modulation_ratio = MODULATION_RATIO_MAX;
-            } else if (modulation_ratio < MODULATION_RATIO_MIN) {
-                modulation_ratio = MODULATION_RATIO_MIN;
-            }
             g_vpp_sum = 0.0f;
+
+            if (modulation_ratio + modulation_ratio_delta > MODULATION_RATIO_MAX) {
+                modulation_ratio = MODULATION_RATIO_MAX;
+            } else if (modulation_ratio + modulation_ratio_delta < MODULATION_RATIO_MIN) {
+                modulation_ratio = MODULATION_RATIO_MIN;
+            } else {
+                modulation_ratio += modulation_ratio_delta;
+            }
+            last_err = err;
         }
     }
 }
