@@ -27,6 +27,8 @@ virtualFolder:
                 - path: Core/Inc/app.h
                 - path: Core/Src/inverter.c
                 - path: Core/Inc/inverter.h
+                - path: Core/Src/pll.c
+                - path: Core/Inc/pll.h
               folders: []
     - name: Drivers
       files: []

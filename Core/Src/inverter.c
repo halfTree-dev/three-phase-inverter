@@ -34,6 +34,7 @@ static uint16_t Get_SPWM_Counter_Value(uint32_t phase) {
 void Inverter_Init() {
     volatile float dummy = sinf(0.5f);
     (void)dummy;
+    HAL_Delay(100);
 
     HAL_TIM_Base_Start_IT(&htim1);
 
@@ -46,8 +47,8 @@ void Inverter_Init() {
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
     HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
 
-    LL_ADC_StartCalibration(ADC1, ADC_SINGLE_ENDED);
-    while (LL_ADC_IsCalibrationOnGoing(ADC1));
+    HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
+    HAL_Delay(100);
 
     HAL_ADCEx_InjectedStart_IT(&hadc1);
 }
